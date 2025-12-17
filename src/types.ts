@@ -1,5 +1,27 @@
 export interface Description {
-  htmlBody: string;
+  htmlBody?: string;
+  markdownBody?: string;
+}
+
+export interface User {
+  name: string;
+  email?: string;
+}
+
+export interface WorkflowStatus {
+  name: string;
+}
+
+export interface Comment {
+  body: string;
+  createdAt: string;
+  user: User;
+}
+
+export interface Requirement {
+  name: string;
+  description: Description;
+  workflowStatus: WorkflowStatus;
 }
 
 export interface Record {
@@ -7,12 +29,62 @@ export interface Record {
   description: Description;
 }
 
+export interface Feature {
+  id: string;
+  name: string;
+  referenceNum: string;
+  path: string;
+  description: Description;
+  workflowStatus: WorkflowStatus;
+  assignedToUser?: User;
+  createdByUser?: User;
+  createdAt: string;
+  updatedAt: string;
+  startDate?: string;
+  dueDate?: string;
+  epic?: { name: string; referenceNum: string };
+  initiative?: { name: string; referenceNum: string; description: Description };
+  release: { name: string; referenceNum: string };
+  project: { name: string; referencePrefix: string };
+  goals: Array<{ name: string }>;
+  tagList: string;
+  comments: Comment[];
+  commentsCount: number;
+  requirements: Requirement[];
+  requirementsCount: number;
+}
+
 export interface FeatureResponse {
-  feature: Record;
+  feature: Feature;
 }
 
 export interface RequirementResponse {
   requirement: Record;
+}
+
+// Search features (REST API)
+export interface SearchFeaturesRequest {
+  q?: string;
+  product_id?: string;
+  assigned_to_user?: string;
+  tag?: string;
+  updated_since?: string;
+}
+
+export interface SearchFeaturesResponse {
+  features: Array<{
+    id: string;
+    reference_num: string;
+    name: string;
+    created_at: string;
+    url: string;
+    product_id: string;
+  }>;
+  pagination: {
+    total_records: number;
+    total_pages: number;
+    current_page: number;
+  };
 }
 
 export interface PageResponse {

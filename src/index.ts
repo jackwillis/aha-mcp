@@ -115,6 +115,37 @@ class AhaMcp {
           },
         },
         {
+          name: "search_features",
+          description:
+            "Search for Aha! features by name, assignee, tag, or update date",
+          inputSchema: {
+            type: "object",
+            properties: {
+              q: {
+                type: "string",
+                description: "Search term to match against feature name",
+              },
+              product_id: {
+                type: "string",
+                description: "Filter by product/project ID",
+              },
+              assigned_to_user: {
+                type: "string",
+                description: "Filter by assignee (user ID or email)",
+              },
+              tag: {
+                type: "string",
+                description: "Filter by tag",
+              },
+              updated_since: {
+                type: "string",
+                description:
+                  "Only features updated after this timestamp (ISO8601)",
+              },
+            },
+          },
+        },
+        {
           name: "create_feature",
           description: "Create a new feature in Aha!",
           inputSchema: {
@@ -222,6 +253,8 @@ class AhaMcp {
         return this.handlers.handleGetPage(request);
       } else if (request.params.name === "search_documents") {
         return this.handlers.handleSearchDocuments(request);
+      } else if (request.params.name === "search_features") {
+        return this.handlers.handleSearchFeatures(request);
       } else if (request.params.name === "create_feature") {
         return this.handlers.handleCreateFeature(request);
       }

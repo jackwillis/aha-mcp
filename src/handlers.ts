@@ -11,6 +11,8 @@ import {
   SearchResponse,
   CreateFeatureRequest,
   CreateFeatureResponse,
+  SearchFeaturesRequest,
+  SearchFeaturesResponse,
 } from "./types.js";
 import {
   getFeatureQuery,
@@ -322,6 +324,73 @@ export class Handlers {
       throw new McpError(
         ErrorCode.InternalError,
         `Failed to create feature: ${errorMessage}`
+      );
+    }
+  }
+
+  async handleSearchFeatures(request: any) {
+    const { q, product_id, assigned_to_user, tag, updated_since } =
+      request.params.arguments as SearchFeaturesRequest;
+
+    try {
+      const ahaApiToken = process.env.AHA_API_TOKEN;
+      const ahaDomain = process.env.AHA_DOMAIN;
+
+      if (!ahaApiToken || !ahaDomain) {
+        throw new McpError(
+          ErrorCode.InternalError,
+          "Missing AHA_API_TOKEN or AHA_DOMAIN environment variables"
+        );
+      }
+
+      // Build query string
+      const params = new URLSearchParams();
+      if (q) params.append("q", q);
+      if (product_id) params.append("product_id", product_id);
+      if (assigned_to_user) params.append("assigned_to_user", assigned_to_user);
+      if (tag) params.append("tag", tag);
+      if (updated_since) params.append("updated_since", updated_since);
+
+      const response = await fetch(
+        `https://${ahaDomain}.aha.io/api/v1/features?${params.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${ahaApiToken}`,
+            "Accept": 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new McpError(
+          ErrorCode.InternalError,
+          `Aha! API error (${response.status}): ${errorText}`
+        );
+      }
+
+      const data: SearchFeaturesResponse = await response.json();
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(data, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error("API Error:", errorMessage);
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to search features: ${errorMessage}`
       );
     }
   }

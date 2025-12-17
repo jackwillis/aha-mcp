@@ -157,13 +157,32 @@ Retrieves an Aha! feature or requirement by reference number.
 **Response:**
 ```json
 {
-  "reference_num": "DEVELOP-123",
+  "id": "123456",
   "name": "Feature name",
-  "description": "Feature description",
-  "workflow_status": {
-    "name": "In development",
-    "id": "123456"
-  }
+  "referenceNum": "DEVELOP-123",
+  "path": "/features/DEVELOP-123",
+  "description": {
+    "markdownBody": "Feature description in markdown"
+  },
+  "workflowStatus": {
+    "name": "In development"
+  },
+  "assignedToUser": {
+    "name": "John Developer",
+    "email": "developer@company.com"
+  },
+  "release": {
+    "name": "Q1 Release",
+    "referenceNum": "PRJ-R-1"
+  },
+  "project": {
+    "name": "Project Name",
+    "referencePrefix": "PRJ"
+  },
+  "comments": [],
+  "commentsCount": 0,
+  "requirements": [],
+  "requirementsCount": 0
 }
 ```
 
@@ -186,12 +205,19 @@ Gets an Aha! page by reference number.
 **Response:**
 ```json
 {
-  "reference_num": "ABC-N-213",
   "name": "Page title",
-  "body": "Page content",
+  "description": {
+    "markdownBody": "Page content in markdown"
+  },
+  "children": [
+    {
+      "name": "Child page",
+      "referenceNum": "ABC-N-214"
+    }
+  ],
   "parent": {
-    "reference_num": "ABC-N-200",
-    "name": "Parent page"
+    "name": "Parent page",
+    "referenceNum": "ABC-N-200"
   }
 }
 ```
@@ -215,19 +241,63 @@ Searches for Aha! documents.
 **Response:**
 ```json
 {
-  "results": [
+  "nodes": [
     {
-      "reference_num": "ABC-N-123",
       "name": "Product Roadmap 2025",
-      "type": "Page",
-      "url": "https://company.aha.io/pages/ABC-N-123"
+      "url": "/pages/ABC-N-123",
+      "searchableId": "123456789",
+      "searchableType": "Page"
     }
   ],
-  "total_results": 1
+  "currentPage": 1,
+  "totalCount": 1,
+  "totalPages": 1,
+  "isLastPage": true
 }
 ```
 
-### 4. create_feature
+### 4. search_features
+
+Searches for Aha! features by name, assignee, tag, or update date.
+
+**Parameters:**
+- `q` (optional): Search term to match against feature name
+- `product_id` (optional): Filter by product/project ID
+- `assigned_to_user` (optional): Filter by assignee (user ID or email)
+- `tag` (optional): Filter by tag
+- `updated_since` (optional): Only features updated after this timestamp (ISO8601)
+
+**Example:**
+```json
+{
+  "q": "authentication",
+  "assigned_to_user": "developer@company.com"
+}
+```
+
+**Response:**
+```json
+{
+  "features": [
+    {
+      "id": "12345",
+      "reference_num": "DEVELOP-123",
+      "name": "User Authentication",
+      "created_at": "2024-01-15T10:30:00.000Z",
+      "url": "https://company.aha.io/features/DEVELOP-123",
+      "resource": "https://company.aha.io/api/v1/features/DEVELOP-123",
+      "product_id": "67890"
+    }
+  ],
+  "pagination": {
+    "total_records": 1,
+    "total_pages": 1,
+    "current_page": 1
+  }
+}
+```
+
+### 5. create_feature
 
 Creates a new feature in Aha!
 
@@ -295,6 +365,8 @@ Creates a new feature in Aha!
 - "Search for pages about launch planning"
 - "Get requirement ADT-123-1"
 - "Find all pages mentioning Q2 goals"
+- "Search for features assigned to me"
+- "Find features with the tag 'backend'"
 - "Create a new feature called 'User Authentication' in release PRJ1-R-1"
 - "Create a feature for mobile push notifications in release MOBILE-R-2"
 

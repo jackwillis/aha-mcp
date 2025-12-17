@@ -20,10 +20,30 @@ export const getPageQuery = `
 export const getFeatureQuery = `
   query GetFeature($id: ID!) {
     feature(id: $id) {
+      id
       name
-      description {
-        markdownBody
-      }
+      referenceNum
+      path
+      description { markdownBody }
+      workflowStatus { name }
+      assignedToUser { name email }
+      createdByUser { name }
+      createdAt
+      updatedAt
+      startDate
+      dueDate
+
+      epic { name referenceNum }
+      initiative { name referenceNum description { markdownBody } }
+      release { name referenceNum }
+      project { name referencePrefix }
+      goals { name }
+      tagList
+
+      comments { body createdAt user { name } }
+      commentsCount
+      requirements { name description { markdownBody } workflowStatus { name } }
+      requirementsCount
     }
   }
 `;
